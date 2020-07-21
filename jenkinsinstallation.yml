@@ -1,0 +1,27 @@
+---
+- name: jenkins configuration setup
+  hosts: all
+  tasks: 
+   - name: install tomcat8, tomcat8-admin, git, maven
+     apt:
+      name: "{{item.a}}"
+      state: "{{item.b}}"
+      update_cache: "{{item.c}}"
+     with_items:
+      - {a: openjdk-8-jdk, b: present, c: yes}
+      - {a: tomcat8-admin, b: present, c: no}
+      - {a: git, b: present, c: no}
+      - {a: maven, b: present, c: no}
+   - name: dowload jenkins war file
+     get_url:
+      url: http://mirrors.jenkins-ci.org/war-stable/latest/jenkns.war
+      dest: /home/ubuntu
+   - name: copy tomcat-users.xml
+     copy:
+      src: tomcat-users.xml
+      dest: /etc/tomcat8
+   - name: restart tomcat8
+     service:
+      name: tomcat8
+      state: restarted
+
